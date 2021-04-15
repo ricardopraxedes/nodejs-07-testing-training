@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import "express-async-errors";
 import "reflect-metadata";
 import swaggerUi from "swagger-ui-express";
@@ -18,14 +18,16 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.use(router);
 
-app.use((error: Error, request: Request, response: Response) => {
-  if (error instanceof AppError) {
-    return response.status(error.statusCode).json({ message: error.message });
-  }
+app.use(
+  (error: Error, request: Request, response: Response, next: NextFunction) => {
+    if (error instanceof AppError) {
+      return response.status(error.statusCode).json({ message: error.message });
+    }
 
-  return response
-    .status(500)
-    .json({ message: `Internal Server Error - ${error.message}` });
-});
+    return response
+      .status(500)
+      .json({ message: `Internal Server Error - ${error.message}` });
+  }
+);
 
 export { app };
